@@ -12,8 +12,8 @@ from api_info import API_KEY
 @task(retries=3)
 def extract_data() -> str:
     """
-    NYT top movie reviews API connection to be re-used across functions.
-    API call will return 20 most recent movies reviews from the NYT. 
+    NYT movie reviews API connection to be re-used across functions.
+    API call will return all the critics data from the NYT. 
     """
     payload = {"api-key": API_KEY}
     r = requests.get(f"{base_url}/critics/all.json", params=payload)
@@ -23,8 +23,7 @@ def extract_data() -> str:
 @task(log_prints=True)
 def arrange_data(r) -> pd.DataFrame:
     """
-    Use NYT API to find movie reviews including title, critic, link, and description.
-    Change the recommend column to int type for testing purposes.
+    Use NYT API to find critics including name, status and bio.
     Return pandas df.
     """
     
@@ -68,10 +67,10 @@ def validate_data(df: pd.DataFrame) -> bool:
 
 @task()
 def write_local(df: pd.DataFrame) -> Path:
-    """Write DataFrame out as parquet file"""
-    data_dir = f'data/review'
+    """Save dataframe as parquet file"""
+    data_dir = f'data/critics'
     Path(data_dir).mkdir(parents=True, exist_ok=True)
-    path = Path(f'{data_dir}/{date_filter}.parquet')
+    path = Path(f'{data_dir}/critics.parquet')
     df.to_parquet(path, compression='gzip')
     print('File saved to local.')
     return path
@@ -85,17 +84,12 @@ def write_gcs(path: Path) -> None:
 
 
 
-
-
-
-return critics_df
-
-
-
 @flow()
 def load_critics_data():
     """
-   Description
+   ETL function to load critics data, check validity and 
+   save as parquet to local and then load into GCS
+   
     """
 
     base_url = 'https://api.nytimes.com/svc/movies/v2/'

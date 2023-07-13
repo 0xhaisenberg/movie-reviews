@@ -11,7 +11,7 @@ from api_info import API_KEY
 @task(retries=3)
 def extract_data(publication_dt: str) -> pd.DataFrame:
     """
-    NYT top movie reviews API connection to be re-used across functions.
+    NYT movie reviews API connection to be re-used across functions.
     API call will return 20 most recent movies reviews from the NYT API. 
     """
     payload = {"api-key": API_KEY, "publication-date": publication_dt, "offset":offset_params}
@@ -36,6 +36,9 @@ def extract_data(publication_dt: str) -> pd.DataFrame:
 
 @task(log_prints=True)
 def rearrange_data(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Selecting necessary columns and rearranging columns
+    """
 
     df.rename(columns = {'display_title': 'title', 'critics_pick': 'recommendation',
                         'byline': 'critic', 'summary_short': 'description', 
@@ -91,7 +94,7 @@ def validate_data(df: pd.DataFrame) -> bool:
 
 @task()
 def write_local(df: pd.DataFrame) -> Path:
-    """Write DataFrame out as parquet file"""
+    """Write DataFrame out as parquet file and save to local"""
     data_dir = f'data/review'
     Path(data_dir).mkdir(parents=True, exist_ok=True)
     path = Path(f'{data_dir}/{date_filter}.parquet')
@@ -109,8 +112,8 @@ def write_gcs(path: Path) -> None:
 @flow()
 def load_movies_data():
     """
-    Load movies df into csv file into S3 bucket.
-    Before loading, use check_if_valid_data function to validate results.
+    Load movies df into parquet file, then load to GCS
+    Before loading, use validate_data function to validate results.
     """
 
     base_url = 'https://api.nytimes.com/svc/movies/v2/'
