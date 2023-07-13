@@ -18,7 +18,6 @@ def extract_data(publication_dt: str) -> pd.DataFrame:
     r = requests.get(f"{base_url}reviews/all.json", params=payload)
     df = pd.DataFrame()
     
-    
     for offset in offset_params:
         print('Sequence Started...')
         print(offset)
