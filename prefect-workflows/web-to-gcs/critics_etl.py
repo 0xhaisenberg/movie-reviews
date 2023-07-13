@@ -9,6 +9,7 @@ from prefect import flow, task
 from prefect_gcp.cloud_storage import GcsBucket
 from api_info import API_KEY
 
+
 @task(retries=3)
 def extract_data() -> str:
     """
