@@ -116,7 +116,7 @@ def load_movies_data():
     """
 
     base_url = 'https://api.nytimes.com/svc/movies/v2/'
-    offset_params = [num for num in range(0, 120, 20)]
+    offset_params = [num for num in range(0, 60, 20)]
 
 
     final_df = filter_movies_data()
