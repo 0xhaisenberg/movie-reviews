@@ -1,6 +1,7 @@
 import pandas as pd
 import requests
 import json
+import time
 from datetime import date, timedelta
 from pathlib import Path
 from prefect import flow, task
@@ -8,12 +9,16 @@ from prefect_gcp.cloud_storage import GcsBucket
 from api_info import API_KEY
 
 
-@task(retries=3)
+@task(retries=2)
 def extract_data(publication_dt: str) -> pd.DataFrame:
     """
     NYT movie reviews API connection to be re-used across functions.
     API call will return 20 most recent movies reviews from the NYT API. 
     """
+
+    base_url = 'https://api.nytimes.com/svc/movies/v2/'
+    offset_params = [num for num in range(0, 150, 20)]
+
     payload = {"api-key": API_KEY, "publication-date": publication_dt, "offset":offset_params}
     r = requests.get(f"{base_url}reviews/all.json", params=payload)
     df = pd.DataFrame()
@@ -23,7 +28,7 @@ def extract_data(publication_dt: str) -> pd.DataFrame:
         print(offset)
         r = requests.get(f"{base_url}reviews/all.json", params=payload)
         print('Entering Sleep Mode...')
-        time.sleep(10)
+        time.sleep(8)
         result = r.json()
         movies = result['results']
         frame = pd.json_normalize(movies)
@@ -50,7 +55,7 @@ def rearrange_data(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-@task()
+@flow()
 def filter_movies_data() -> pd.DataFrame:
     """
     Filter movies data for last 3 months as the ETL frequency will be quarterly.
@@ -94,6 +99,12 @@ def validate_data(df: pd.DataFrame) -> bool:
 @task()
 def write_local(df: pd.DataFrame) -> Path:
     """Write DataFrame out as parquet file and save to local"""
+
+    yesterdays_dt = (date.today() - timedelta(1)).strftime('%Y-%m-%d')
+    past_quarter = (date.today() - timedelta(90)).strftime('%Y-%m-%d')
+    # API date filter is start_dt:end_dt and uses the following format "YYYY-MM-DD:YYYY-MM-DD"
+    date_filter = f'{past_quarter}:{yesterdays_dt}'
+
     data_dir = f'data/review'
     Path(data_dir).mkdir(parents=True, exist_ok=True)
     path = Path(f'{data_dir}/{date_filter}.parquet')
@@ -115,9 +126,6 @@ def load_movies_data():
     Before loading, use validate_data function to validate results.
     """
 
-    base_url = 'https://api.nytimes.com/svc/movies/v2/'
-    offset_params = [num for num in range(0, 60, 20)]
-
 
     final_df = filter_movies_data()
 
@@ -128,9 +136,16 @@ def load_movies_data():
 
     try:
         # Convert to parquet, upload to GCS
-        write_local(final_df)
+        path = write_local(final_df)
         print('File saved successfully')
         write_gcs(path)
         print('File exported successfully')
     except Exception as e:
         print(f"{e} \nData not exported, please check errors")
+
+
+
+"""
+if __name__ == '__main__':
+    load_movies_data()
+"""
