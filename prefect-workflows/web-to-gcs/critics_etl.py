@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import requests
 import json
-import time
 from datetime import date, timedelta
 from pathlib import Path
 from prefect import flow, task
@@ -16,6 +15,8 @@ def fetch_data() -> str:
     NYT movie reviews API connection to be re-used across functions.
     API call will return all the critics data from the NYT. 
     """
+    base_url = 'https://api.nytimes.com/svc/movies/v2/'
+
     payload = {"api-key": API_KEY}
     r = requests.get(f"{base_url}/critics/all.json", params=payload)
     
@@ -93,8 +94,6 @@ def load_critics_data():
    
     """
 
-    base_url = 'https://api.nytimes.com/svc/movies/v2/'
-
     r = fetch_data()
     critics_df = arrange_data(r)
     
@@ -105,9 +104,15 @@ def load_critics_data():
     
     try:
         # Convert to parquet, upload to GCS
-        write_to_local(critics_df)
+        path = write_to_local(critics_df)
         print('File saved successfully')
         write_to_gcs(path)
         print('File exported successfully')
     except Exception as e:
         print(f"{e} \nData not exported, please check errors")
+
+
+"""
+if __name__ == '__main__':
+    load_critics_data()
+"""
