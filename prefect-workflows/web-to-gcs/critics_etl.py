@@ -11,7 +11,7 @@ from api_info import API_KEY
 
 
 @task(retries=3)
-def extract_data() -> str:
+def fetch_data() -> str:
     """
     NYT movie reviews API connection to be re-used across functions.
     API call will return all the critics data from the NYT. 
@@ -45,7 +45,7 @@ def arrange_data(r) -> pd.DataFrame:
 
 
 @task()
-def validate_data(df: pd.DataFrame) -> bool:
+def is_data_valid(df: pd.DataFrame) -> bool:
     """
     Data validation used before proceeding to load stage.
     Check if there is data and if the primary key is unique. 
@@ -67,7 +67,7 @@ def validate_data(df: pd.DataFrame) -> bool:
 
 
 @task()
-def write_local(df: pd.DataFrame) -> Path:
+def write_to_local(df: pd.DataFrame) -> Path:
     """Save dataframe as parquet file"""
     data_dir = f'data/critics'
     Path(data_dir).mkdir(parents=True, exist_ok=True)
@@ -78,7 +78,7 @@ def write_local(df: pd.DataFrame) -> Path:
 
 
 @task()
-def write_gcs(path: Path) -> None:
+def write_to_gcs(path: Path) -> None:
     """Upload local parquet file to GCS"""
     gcp_cloud_storage_bucket_block = GcsBucket.load("movie-reviews")
     gcp_cloud_storage_bucket_block.upload_from_path(from_path=path, to_path=path)
@@ -95,19 +95,19 @@ def load_critics_data():
 
     base_url = 'https://api.nytimes.com/svc/movies/v2/'
 
-    r = extract_data()
+    r = fetch_data()
     critics_df = arrange_data(r)
     
     # Validate results
-    if validate_data(critics_df):
+    if is_data_valid(critics_df):
         print("Data valid, proceed to load")
         
     
     try:
         # Convert to parquet, upload to GCS
-        write_local(critics_df)
+        write_to_local(critics_df)
         print('File saved successfully')
-        write_gcs(path)
+        write_to_gcs(path)
         print('File exported successfully')
     except Exception as e:
         print(f"{e} \nData not exported, please check errors")
