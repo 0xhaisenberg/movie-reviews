@@ -80,7 +80,7 @@ def write_local(df: pd.DataFrame) -> Path:
 @task()
 def write_gcs(path: Path) -> None:
     """Upload local parquet file to GCS"""
-    gcp_cloud_storage_bucket_block = GcsBucket.load("zoomcamp-gcs")
+    gcp_cloud_storage_bucket_block = GcsBucket.load("movie-reviews")
     gcp_cloud_storage_bucket_block.upload_from_path(from_path=path, to_path=path)
 
 
