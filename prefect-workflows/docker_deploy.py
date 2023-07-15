@@ -26,23 +26,3 @@ if __name__ == '__main__':
         schedule=CronSchedule(cron='0 1 * * *', timezone='UTC', day_or=True)
     )
     etl_gcs_to_bq_deployment.apply()
-
-
-
-
-
-
-from prefect.deployments import Deployment
-from parameterized_flow import etl_parent_flow
-from prefect.infrastructure.docker import DockerContainer
-
-docker_block = DockerContainer.load("zoom")
-
-docker_dep = Deployment.build_from_flow(
-    flow=etl_parent_flow,
-    name='docker-flow',
-    infrastructure=docker_block
-)
-
-if __name__ == '__main__':
-    docker_dep.apply()
