@@ -23,8 +23,7 @@ def extract_data(publication_dt: str) -> pd.DataFrame:
     df = pd.DataFrame()
     
     r = requests.get(f"{base_url}reviews/all.json", params=payload)
-    print('Entering Sleep Mode...')
-    time.sleep(8)
+
     result = r.json()
     movies = result['results']
     frame = pd.json_normalize(movies)
@@ -89,8 +88,6 @@ def validate_data(df: pd.DataFrame) -> bool:
         raise Exception("None of the dates returned match the dates selected")
 
     return True
-
-
 
 @task()
 def write_local(df: pd.DataFrame) -> Path:
