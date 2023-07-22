@@ -1,0 +1,19 @@
+models:
+  - name: critics_pick
+    description: Movies recommended by critics
+    columns:
+      - name: title
+        description: Name of movie
+      - name: description
+        description: Short summary of the movie
+      - name: mpaa_rating
+        description: movie rating
+      - name: opening_date
+        description: movie opening date
+  - name: critics
+    description: The list of all critics
+    columns:
+      - name: name
+        description: name of reviewer
+      - name: bio
+        description: short introduction of reviewer
