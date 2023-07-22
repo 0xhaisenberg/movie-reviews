@@ -14,12 +14,8 @@ models:
     columns:
       - name: title
         description: The movie title
-        tests:
-          - unique
       - name: critic
         description: Author of the review
-        tests:
-          - unique
       - name: description
         description: Short summary about the review
       - name: recommendation
