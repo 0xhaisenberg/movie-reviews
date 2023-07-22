@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: staging
+    database: movie-reviews-392119
+    schema: movie_reviews_all
+
+    tables:
+      - name: movie_critics
+      - name: movie_data
