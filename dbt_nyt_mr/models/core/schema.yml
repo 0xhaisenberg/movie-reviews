@@ -1,0 +1,5 @@
+models:
+  - name: critics_pick
+    description: Movies recommended by critics
+  - name: critics
+    description: The list of all critics

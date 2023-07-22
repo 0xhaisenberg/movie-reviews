@@ -1,0 +1,40 @@
+version: 2
+
+sources:
+  - name: staging
+    database: movie-reviews-392119
+    schema: movie_reviews_all
+    tables:
+      - name: movie_critics
+      - name: movie_data
+
+models:
+  - name: stg_movie_data
+    description: Review results of movies
+    columns:
+      - name: title
+        description: The movie title
+      - name: critic
+        description: Author of the review
+      - name: description
+        description: Short summary about the review
+      - name: recommendation
+        description: Whether the critic recommends the movie or not. Set to 1 if a critics' pick and 0 if not.
+      - name: opening_date
+        description: Movie U.S. opening date.
+      - name: publication_date
+        description: Review publication date.
+      - name: mpaa_rating
+        description: Movie MPAA rating (e.g. PG-13).
+      - name: review_url
+        description: Link to the detailed review
+
+  - name: stg_critics
+    description: A database of active critics
+    columns:
+      - name: name
+        description: Name of critic. Sorted from A-Z
+      - name: status
+        description: Whether the critic is full-time or part-time
+      - name: bio
+        description: A short introduction of critic
