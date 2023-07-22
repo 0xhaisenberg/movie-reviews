@@ -8,3 +8,43 @@ sources:
     tables:
       - name: movie_critics
       - name: movie_data
+
+
+models:
+  - name: stg_movie_data
+    description: Review results of movies
+    columns:
+      - name: title
+        description: The movie title
+        tests:
+          - unique:
+      - name: critic
+        description: movie critc
+        tests:
+          - unique:
+      - name: description
+        description: A short description of the movie
+      - name: recommendation
+        description: Whether the critic recommends the movie or not. 1 for yes, 0 for - not_null
+      - name: opening_date
+        description: 
+      - name: publication_date
+        description: 
+      - name: mpaa_rating
+        description: 
+        tests:
+          - accepted_values:
+              values: ['']
+      - name: review_url
+        description: Link to the detailed review
+
+
+  - name: stg_critics
+    description: A database of active critics
+    columns:
+      - name: name
+        description: Name of critic. Sorted from A-Z
+      - name: status
+        description: Whether the critic is full-time or part-time
+      - name: bio
+        description: A short introduction of critic
