@@ -4,11 +4,9 @@ sources:
   - name: staging
     database: movie-reviews-392119
     schema: movie_reviews_all
-
     tables:
       - name: movie_critics
       - name: movie_data
-
 
 models:
   - name: stg_movie_data
@@ -17,27 +15,23 @@ models:
       - name: title
         description: The movie title
         tests:
-          - unique:
+          - unique
       - name: critic
-        description: movie critc
+        description: Author of the review
         tests:
-          - unique:
+          - unique
       - name: description
-        description: A short description of the movie
+        description: Short summary about the review
       - name: recommendation
-        description: Whether the critic recommends the movie or not. 1 for yes, 0 for - not_null
+        description: Whether the critic recommends the movie or not. Set to 1 if a critics' pick and 0 if not.
       - name: opening_date
-        description: 
+        description: Movie U.S. opening date.
       - name: publication_date
-        description: 
+        description: Review publication date.
       - name: mpaa_rating
-        description: 
-        tests:
-          - accepted_values:
-              values: ['']
+        description: Movie MPAA rating (e.g. PG-13).
       - name: review_url
         description: Link to the detailed review
-
 
   - name: stg_critics
     description: A database of active critics
