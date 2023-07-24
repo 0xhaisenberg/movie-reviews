@@ -1,4 +1,4 @@
-## NYT Developer Movie Reviews Project
+## NYT Developer Movie Reviews Data Engineering Project
 
 I built a batch data pipeline that extracts, transforms and loads the [Movie Reviews from the NY Times Dev Portal](https://developer.nytimes.com/) into a Data Warehouse in the [Google Cloud Platform (GCP)](https://cloud.google.com/) and models the data in [Data build tool (dbt)](https://www.getdbt.com/).
 
